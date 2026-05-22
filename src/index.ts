@@ -11,7 +11,7 @@ function getRequiredEnv(name: string): string {
   return value;
 }
 
-const baseUrl = process.env.MELOQA_BASE_URL ?? "https://app.meloqa.com";
+const baseUrl = process.env.MELOQA_BASE_URL ?? "http://localhost:3000";
 const apiToken = getRequiredEnv("MELOQA_API_TOKEN");
 const rateLimitPerMin = process.env.MELOQA_RATE_LIMIT
   ? Number(process.env.MELOQA_RATE_LIMIT)

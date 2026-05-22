@@ -1,8 +1,10 @@
 # meloqa-mcp
 
-Model Context Protocol (MCP) server for the [meloQA](https://meloqa.com) public **v1** API.
+Model Context Protocol (MCP) server for the meloQA public **v1** API.
 
 Exposes every operation from the v1 OpenAPI spec as an MCP tool, so LLM clients (Claude Desktop, Claude Code, Cursor, etc.) can read and manage meloQA projects, test cases, cycles, executions, bugs, links, and reference data.
+
+> **Status:** pre-release. The meloQA v1 API does not yet have a stable public URL — point `MELOQA_BASE_URL` at your own instance (defaults to `http://localhost:3000`).
 
 ## Requirements
 
@@ -23,7 +25,7 @@ Add an entry to your MCP config (`~/Library/Application Support/Claude/claude_de
       "args": ["-y", "@meloqa/mcp-server"],
       "env": {
         "MELOQA_API_TOKEN": "your-token-here",
-        "MELOQA_BASE_URL": "https://app.meloqa.com"
+        "MELOQA_BASE_URL": "http://localhost:3000"
       }
     }
   }
@@ -37,7 +39,7 @@ Restart the client. The `meloqa` server should appear with ~70 tools (one per v1
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
 | `MELOQA_API_TOKEN` | yes | — | API token sent verbatim in the `Authorization` header (no `Bearer` prefix). |
-| `MELOQA_BASE_URL` | no | `https://app.meloqa.com` | Base URL of the meloQA instance. Set to `http://localhost:3000` for local dev. |
+| `MELOQA_BASE_URL` | no | `http://localhost:3000` | Base URL of the meloQA instance. No official public URL exists yet — point this at your own deployment. |
 | `MELOQA_RATE_LIMIT` | no | `30` | Client-side limit (requests/minute) used to throttle outgoing calls. Match the server's limit. |
 
 ## Tools

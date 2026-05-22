@@ -41,9 +41,5 @@
     "meloqa",
     "qa",
     "test-management"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/meloqa/mcp-server"
-  }
+  ]
 }
