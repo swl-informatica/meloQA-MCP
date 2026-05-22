@@ -53,7 +53,7 @@ Runtime input validation is delegated to the MCP host (which validates against `
 
 These are encoded in [src/client.ts](src/client.ts) and matter when changing the client:
 
-- **Auth header**: `Authorization: <token>` — raw token, **no `Bearer` prefix**.
+- **Auth header**: `Authorization: Bearer <token>` (standard RFC 6750 Bearer scheme).
 - **Rate limit**: server caps at **30 req/min** per token. The client implements a sliding-window limiter (`RateLimiter` in [src/client.ts](src/client.ts)) that blocks outgoing calls; tune via `MELOQA_RATE_LIMIT`. 429s from the server are surfaced as tool errors.
 - **Error mapping**: Prisma errors are mapped to **400/404** on the server side (not 406). Don't special-case 406.
 
@@ -82,5 +82,5 @@ The codegen step has no test suite — the smoke test is `npm run build` followe
 ## Do not
 
 - Edit `src/tools.generated.ts` by hand. It's committed for transparency/IDE jump-to-source, but it's regenerated on every build.
-- Add a `Bearer ` prefix to the Authorization header. Will 401.
+- Drop the `Bearer ` prefix from the Authorization header. Will 401.
 - Add `operationId`-based logic; the spec doesn't define any.

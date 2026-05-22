@@ -65,8 +65,7 @@ export class MeloqaClient {
     const init: RequestInit = {
       method: req.method,
       headers: {
-        // meloQA v1 expects the raw token in Authorization (no "Bearer" prefix).
-        Authorization: this.apiToken,
+        Authorization: `Bearer ${this.apiToken}`,
         Accept: "application/json",
       },
     };

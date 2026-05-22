@@ -38,7 +38,7 @@ Restart the client. The `meloqa` server should appear with ~70 tools (one per v1
 
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
-| `MELOQA_API_TOKEN` | yes | — | API token sent verbatim in the `Authorization` header (no `Bearer` prefix). |
+| `MELOQA_API_TOKEN` | yes | — | API token sent as `Authorization: Bearer <token>`. |
 | `MELOQA_BASE_URL` | no | `http://localhost:3000` | Base URL of the meloQA instance. No official public URL exists yet — point this at your own deployment. |
 | `MELOQA_RATE_LIMIT` | no | `30` | Client-side limit (requests/minute) used to throttle outgoing calls. Match the server's limit. |
 
@@ -54,7 +54,7 @@ Each tool's `description` includes the OpenAPI `summary`, the tag, and any valid
 
 ## Behavior notes
 
-- **Auth header**: the token is sent as `Authorization: <token>` — no `Bearer` prefix (this matches meloQA v1).
+- **Auth header**: the token is sent as `Authorization: Bearer <token>` (RFC 6750).
 - **Rate limit**: the client uses an in-process sliding-window limiter (default 30 req/min). It blocks outgoing calls until a slot is available. If you hit the server-side 429 anyway, the tool call surfaces a clear error.
 - **Errors**: non-2xx responses (400/401/403/404/etc.) are returned as MCP tool errors with the response body included.
 

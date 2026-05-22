@@ -3,7 +3,7 @@
   "info": {
     "title": "MeloQA Public API",
     "version": "1.0.0",
-    "description": "Public API for MeloQA integrations. Authenticate using an API Token in the Authorization header."
+    "description": "Public API for MeloQA integrations. Authenticate using 'Authorization: Bearer <api-token>'."
   },
   "servers": [
     {
@@ -14,10 +14,10 @@
   "components": {
     "securitySchemes": {
       "ApiToken": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "Authorization",
-        "description": "API Token. Format: <your-api-token>"
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API Token",
+        "description": "API Token. Send as 'Authorization: Bearer <your-api-token>'."
       }
     }
   },
