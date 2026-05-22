@@ -1,0 +1,49 @@
+{
+  "name": "@meloqa/mcp-server",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server for the meloQA public v1 API",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "meloqa-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "spec/openapi.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "sync-spec": "tsx scripts/sync-spec.ts",
+    "gen": "tsx scripts/generate.ts",
+    "build": "npm run gen && tsc",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "meloqa",
+    "qa",
+    "test-management"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meloqa/mcp-server"
+  }
+}
