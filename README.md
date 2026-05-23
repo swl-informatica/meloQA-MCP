@@ -42,6 +42,22 @@ Restart the client. The `meloqa` server should appear with ~70 tools (one per v1
 | `MELOQA_BASE_URL` | no | `http://localhost:3000` | Base URL of the meloQA instance. No official public URL exists yet — point this at your own deployment. |
 | `MELOQA_RATE_LIMIT` | no | `30` | Client-side limit (requests/minute) used to throttle outgoing calls. Match the server's limit. |
 
+## Token lifecycle
+
+The token sits in plaintext inside your MCP client config (e.g. `~/.claude.json`). The file is `chmod 600` by default, but the token still lives on disk — treat it as a credential.
+
+**To rotate** (recommended periodically, and immediately if you suspect exposure):
+
+1. Open the meloQA UI → **Settings → API Tokens**.
+2. Click **Revoke** on the current token. It stops working server-side within seconds.
+3. Click **Generate new token** and copy the new value.
+4. Replace `MELOQA_API_TOKEN` in your MCP client config with the new value.
+5. Restart the MCP client (Claude Desktop / Claude Code / etc.) so it re-spawns the server with the updated env.
+
+**Per-machine tokens**: generate a separate token for each machine/environment so revoking one doesn't break the others.
+
+**Do not commit** your MCP client config (`~/.claude.json`, `.mcp.json`, `claude_desktop_config.json`) to a public repo — it contains the token.
+
 ## Tools
 
 Tool names follow `<resource>_<verb>`, derived from the OpenAPI spec:
