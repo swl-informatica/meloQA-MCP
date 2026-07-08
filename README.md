@@ -9,7 +9,7 @@ Exposes every operation from the v1 OpenAPI spec as an MCP tool, so LLM clients 
 ## Requirements
 
 - Node.js **18+** (uses native `fetch`).
-- A meloQA **API token** (see Settings → API Tokens in the meloQA app).
+- A meloQA **API token** (see User Menu → API Tokens in the meloQA app).
 
 ## Configure in your MCP client
 
@@ -48,7 +48,7 @@ The token sits in plaintext inside your MCP client config (e.g. `~/.claude.json`
 
 **To rotate** (recommended periodically, and immediately if you suspect exposure):
 
-1. Open the meloQA UI → **Settings → API Tokens**.
+1. Open the meloQA UI → **User Menu → API Tokens**.
 2. Click **Revoke** on the current token. It stops working server-side within seconds.
 3. Click **Generate new token** and copy the new value.
 4. Replace `MELOQA_API_TOKEN` in your MCP client config with the new value.
