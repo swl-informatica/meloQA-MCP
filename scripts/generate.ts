@@ -42,6 +42,13 @@ const NAME_OVERRIDES: Record<string, string> = {
   "POST /v1/executions-run": "executions_run",
   "POST /v1/executions-pause": "executions_pause",
   "POST /v1/executions-finish": "executions_finish",
+  // Sub-collection creates: `POST /v1/<res>/{id}/attachments` would otherwise
+  // hit the "POST with {id} → trailing segment is the verb" rule and yield the
+  // clunky `<res>_attachments` (no `_create`). These trailing segments are
+  // plural nouns, not verbs, so pin the conventional `_create` name.
+  "POST /v1/test-cases/{id}/attachments": "test_cases_attachments_create",
+  "POST /v1/bugs/{id}/attachments": "bugs_attachments_create",
+  "POST /v1/executions/{id}/attachments": "executions_attachments_create",
 };
 
 function deriveToolName(method: Method, path: string): string {

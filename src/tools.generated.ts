@@ -1,7 +1,7 @@
 // AUTO-GENERATED — do not edit by hand. Run `npm run gen` to regenerate.
 // Source: spec/openapi.json
 //
-// 71 tools generated from the meloQA Public API v1 spec.
+// 83 tools generated from the meloQA Public API v1 spec.
 
 import type { ToolDef, HttpRequest } from "./types.js";
 
@@ -232,6 +232,130 @@ export const tools: ToolDef[] = [
     const query: Record<string, string> = {};
     if (input.projectId !== undefined && input.projectId !== null) query["projectId"] = String(input.projectId);
     if (Object.keys(query).length > 0) req.query = query;
+    return req;
+  },
+  },
+  {
+    name: "bugs_attachments_create",
+    description: "Create bug attachment (returns presigned upload URL)\n\nTag: Bug Attachments\n\nCria o registro do anexo (uploaded=false) e retorna uma presigned URL S3 (PUT, 300s). Faça o PUT do arquivo na `uploadUrl` e depois confirme com PATCH /v1/bugs/:id/attachments/:attachmentId.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Bug ID"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Tamanho em bytes"
+        },
+        "type": {
+          "type": "string",
+          "description": "MIME type"
+        },
+        "md5": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "fileName",
+        "size",
+        "type",
+        "md5"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "POST", path: `/v1/bugs/${encodeURIComponent(String(input.id))}/attachments` };
+    const body: Record<string, unknown> = {};
+    if (input.fileName !== undefined) body["fileName"] = input.fileName;
+    if (input.size !== undefined) body["size"] = input.size;
+    if (input.type !== undefined) body["type"] = input.type;
+    if (input.md5 !== undefined) body["md5"] = input.md5;
+    req.body = body;
+    return req;
+  },
+  },
+  {
+    name: "bugs_attachments_delete",
+    description: "Delete bug attachment\n\nTag: Bug Attachments\n\nRemove o anexo (registro + arquivo no S3).",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Bug ID"
+        },
+        "attachmentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Attachment ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "attachmentId"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "DELETE", path: `/v1/bugs/${encodeURIComponent(String(input.id))}/attachments/${encodeURIComponent(String(input.attachmentId))}` };
+    return req;
+  },
+  },
+  {
+    name: "bugs_attachments_list",
+    description: "List bug attachments\n\nTag: Bug Attachments\n\nLista os anexos do bug. Itens com `uploaded=true` trazem `downloadUrl` (presigned, 300s).",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Bug ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "GET", path: `/v1/bugs/${encodeURIComponent(String(input.id))}/attachments` };
+    return req;
+  },
+  },
+  {
+    name: "bugs_attachments_update",
+    description: "Confirm bug attachment upload\n\nTag: Bug Attachments\n\nMarca o anexo como enviado (`uploaded=true`) após o PUT no S3.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Bug ID"
+        },
+        "attachmentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Attachment ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "attachmentId"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "PATCH", path: `/v1/bugs/${encodeURIComponent(String(input.id))}/attachments/${encodeURIComponent(String(input.attachmentId))}` };
     return req;
   },
   },
@@ -856,6 +980,130 @@ export const tools: ToolDef[] = [
   },
   },
   {
+    name: "executions_attachments_create",
+    description: "Create execution attachment (returns presigned upload URL)\n\nTag: Execution Attachments\n\nCria o registro do anexo (uploaded=false) e retorna uma presigned URL S3 (PUT, 300s). Faça o PUT do arquivo na `uploadUrl` e depois confirme com PATCH /v1/executions/:id/attachments/:attachmentId.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Execution ID"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Tamanho em bytes"
+        },
+        "type": {
+          "type": "string",
+          "description": "MIME type"
+        },
+        "md5": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "fileName",
+        "size",
+        "type",
+        "md5"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "POST", path: `/v1/executions/${encodeURIComponent(String(input.id))}/attachments` };
+    const body: Record<string, unknown> = {};
+    if (input.fileName !== undefined) body["fileName"] = input.fileName;
+    if (input.size !== undefined) body["size"] = input.size;
+    if (input.type !== undefined) body["type"] = input.type;
+    if (input.md5 !== undefined) body["md5"] = input.md5;
+    req.body = body;
+    return req;
+  },
+  },
+  {
+    name: "executions_attachments_delete",
+    description: "Delete execution attachment\n\nTag: Execution Attachments\n\nRemove o anexo (registro + arquivo no S3).",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Execution ID"
+        },
+        "attachmentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Attachment ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "attachmentId"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "DELETE", path: `/v1/executions/${encodeURIComponent(String(input.id))}/attachments/${encodeURIComponent(String(input.attachmentId))}` };
+    return req;
+  },
+  },
+  {
+    name: "executions_attachments_list",
+    description: "List execution attachments\n\nTag: Execution Attachments\n\nLista os anexos da execução. Itens com `uploaded=true` trazem `downloadUrl` (presigned, 300s).",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Execution ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "GET", path: `/v1/executions/${encodeURIComponent(String(input.id))}/attachments` };
+    return req;
+  },
+  },
+  {
+    name: "executions_attachments_update",
+    description: "Confirm execution attachment upload\n\nTag: Execution Attachments\n\nMarca o anexo como enviado (`uploaded=true`) após o PUT no S3.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Execution ID"
+        },
+        "attachmentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Attachment ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "attachmentId"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "PATCH", path: `/v1/executions/${encodeURIComponent(String(input.id))}/attachments/${encodeURIComponent(String(input.attachmentId))}` };
+    return req;
+  },
+  },
+  {
     name: "executions_create",
     description: "Create execution\n\nTag: Executions\n\nThe `state` field is system-managed and is silently ignored if sent in the body. Use `/v1/executions-run`, `/v1/executions-pause` and `/v1/executions-finish` to drive transitions.",
     inputSchema: {
@@ -992,6 +1240,11 @@ export const tools: ToolDef[] = [
     inputSchema: {
       "type": "object",
       "properties": {
+        "testCaseId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Filter by test case."
+        },
         "testsCycleId": {
           "type": "string",
           "format": "uuid",
@@ -1008,6 +1261,7 @@ export const tools: ToolDef[] = [
     request: (input: any) => {
     const req: HttpRequest = { method: "GET", path: "/v1/executions" };
     const query: Record<string, string> = {};
+    if (input.testCaseId !== undefined && input.testCaseId !== null) query["testCaseId"] = String(input.testCaseId);
     if (input.testsCycleId !== undefined && input.testsCycleId !== null) query["testsCycleId"] = String(input.testsCycleId);
     if (input.projectId !== undefined && input.projectId !== null) query["projectId"] = String(input.projectId);
     if (Object.keys(query).length > 0) req.query = query;
@@ -2062,6 +2316,130 @@ export const tools: ToolDef[] = [
   },
   },
   {
+    name: "test_cases_attachments_create",
+    description: "Create test case attachment (returns presigned upload URL)\n\nTag: Test Case Attachments\n\nCria o registro do anexo (uploaded=false) e retorna uma presigned URL S3 (PUT, 300s). Faça o PUT do arquivo na `uploadUrl` e depois confirme com PATCH /v1/test-cases/:id/attachments/:attachmentId.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case ID"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Tamanho em bytes"
+        },
+        "type": {
+          "type": "string",
+          "description": "MIME type"
+        },
+        "md5": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "fileName",
+        "size",
+        "type",
+        "md5"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "POST", path: `/v1/test-cases/${encodeURIComponent(String(input.id))}/attachments` };
+    const body: Record<string, unknown> = {};
+    if (input.fileName !== undefined) body["fileName"] = input.fileName;
+    if (input.size !== undefined) body["size"] = input.size;
+    if (input.type !== undefined) body["type"] = input.type;
+    if (input.md5 !== undefined) body["md5"] = input.md5;
+    req.body = body;
+    return req;
+  },
+  },
+  {
+    name: "test_cases_attachments_delete",
+    description: "Delete test case attachment\n\nTag: Test Case Attachments\n\nRemove o anexo (registro + arquivo no S3).",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case ID"
+        },
+        "attachmentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Attachment ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "attachmentId"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "DELETE", path: `/v1/test-cases/${encodeURIComponent(String(input.id))}/attachments/${encodeURIComponent(String(input.attachmentId))}` };
+    return req;
+  },
+  },
+  {
+    name: "test_cases_attachments_list",
+    description: "List test case attachments\n\nTag: Test Case Attachments\n\nLista os anexos do test case. Itens com `uploaded=true` trazem `downloadUrl` (presigned, 300s).",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "GET", path: `/v1/test-cases/${encodeURIComponent(String(input.id))}/attachments` };
+    return req;
+  },
+  },
+  {
+    name: "test_cases_attachments_update",
+    description: "Confirm test case attachment upload\n\nTag: Test Case Attachments\n\nMarca o anexo como enviado (`uploaded=true`) após o PUT no S3.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case ID"
+        },
+        "attachmentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Attachment ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "attachmentId"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "PATCH", path: `/v1/test-cases/${encodeURIComponent(String(input.id))}/attachments/${encodeURIComponent(String(input.attachmentId))}` };
+    return req;
+  },
+  },
+  {
     name: "test_cases_create",
     description: "Create test case\n\nTag: Test Cases",
     inputSchema: {
@@ -2109,6 +2487,15 @@ export const tools: ToolDef[] = [
             "NOT_AUTOMATED",
             "AUTOMATED"
           ]
+        },
+        "automated": {
+          "type": "string",
+          "enum": [
+            "NO",
+            "IN_PROGRESS",
+            "YES"
+          ],
+          "description": "Estado de automatização exibido na UI. Se omitido, é derivado de `automation` (AUTOMATED→YES, senão NO)."
         },
         "specificationTime": {
           "type": "integer"
@@ -2209,6 +2596,7 @@ export const tools: ToolDef[] = [
     if (input.folderId !== undefined) body["folderId"] = input.folderId;
     if (input.order !== undefined) body["order"] = input.order;
     if (input.automation !== undefined) body["automation"] = input.automation;
+    if (input.automated !== undefined) body["automated"] = input.automated;
     if (input.specificationTime !== undefined) body["specificationTime"] = input.specificationTime;
     if (input.automatizationTime !== undefined) body["automatizationTime"] = input.automatizationTime;
     if (input.bddRawText !== undefined) body["bddRawText"] = input.bddRawText;
@@ -2387,6 +2775,15 @@ export const tools: ToolDef[] = [
             "AUTOMATED"
           ]
         },
+        "automated": {
+          "type": "string",
+          "enum": [
+            "NO",
+            "IN_PROGRESS",
+            "YES"
+          ],
+          "description": "Estado de automatização exibido na UI. Se omitido, é derivado de `automation` (AUTOMATED→YES, senão NO)."
+        },
         "specificationTime": {
           "type": "integer"
         },
@@ -2485,6 +2882,7 @@ export const tools: ToolDef[] = [
     if (input.folderId !== undefined) body["folderId"] = input.folderId;
     if (input.order !== undefined) body["order"] = input.order;
     if (input.automation !== undefined) body["automation"] = input.automation;
+    if (input.automated !== undefined) body["automated"] = input.automated;
     if (input.specificationTime !== undefined) body["specificationTime"] = input.specificationTime;
     if (input.automatizationTime !== undefined) body["automatizationTime"] = input.automatizationTime;
     if (input.bddRawText !== undefined) body["bddRawText"] = input.bddRawText;

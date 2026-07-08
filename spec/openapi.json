@@ -2032,6 +2032,15 @@
                       "type": "string",
                       "format": "uuid"
                     },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -2099,8 +2108,8 @@
                       "type": "string",
                       "enum": [
                         "NO",
-                        "YES",
-                        "PARTIAL"
+                        "IN_PROGRESS",
+                        "YES"
                       ]
                     },
                     "specificationTime": {
@@ -2319,6 +2328,15 @@
                       "AUTOMATED"
                     ],
                     "nullable": true
+                  },
+                  "automated": {
+                    "type": "string",
+                    "enum": [
+                      "NO",
+                      "IN_PROGRESS",
+                      "YES"
+                    ],
+                    "description": "Estado de automatização exibido na UI. Se omitido, é derivado de `automation` (AUTOMATED→YES, senão NO)."
                   },
                   "specificationTime": {
                     "type": "integer"
@@ -2749,6 +2767,15 @@
                       "type": "string",
                       "format": "uuid"
                     },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -2816,8 +2843,8 @@
                       "type": "string",
                       "enum": [
                         "NO",
-                        "YES",
-                        "PARTIAL"
+                        "IN_PROGRESS",
+                        "YES"
                       ]
                     },
                     "specificationTime": {
@@ -3029,6 +3056,15 @@
                       "NOT_AUTOMATED",
                       "AUTOMATED"
                     ]
+                  },
+                  "automated": {
+                    "type": "string",
+                    "enum": [
+                      "NO",
+                      "IN_PROGRESS",
+                      "YES"
+                    ],
+                    "description": "Estado de automatização exibido na UI. Se omitido, é derivado de `automation` (AUTOMATED→YES, senão NO)."
                   },
                   "specificationTime": {
                     "type": "integer"
@@ -5562,6 +5598,15 @@
                             "type": "string",
                             "format": "uuid"
                           },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "nullable": true
+                          },
                           "testsCycleId": {
                             "type": "string",
                             "format": "uuid"
@@ -5735,6 +5780,16 @@
           }
         },
         "parameters": [
+          {
+            "name": "testCaseId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filter by test case."
+          },
           {
             "name": "testsCycleId",
             "in": "query",
@@ -9621,6 +9676,1035 @@
               "format": "uuid"
             },
             "description": "Link ID"
+          }
+        ]
+      }
+    },
+    "/v1/test-cases/{id}/attachments": {
+      "post": {
+        "tags": [
+          "Test Case Attachments"
+        ],
+        "summary": "Create test case attachment (returns presigned upload URL)",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "md5": {
+                      "type": "string"
+                    },
+                    "uploaded": {
+                      "type": "boolean"
+                    },
+                    "uploadUrl": {
+                      "type": "string",
+                      "description": "Presigned S3 PUT URL (300s). Faça o PUT do arquivo aqui e depois confirme via PATCH."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Cria o registro do anexo (uploaded=false) e retorna uma presigned URL S3 (PUT, 300s). Faça o PUT do arquivo na `uploadUrl` e depois confirme com PATCH /v1/test-cases/:id/attachments/:attachmentId.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Test Case ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fileName",
+                  "size",
+                  "type",
+                  "md5"
+                ],
+                "properties": {
+                  "fileName": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "integer",
+                    "description": "Tamanho em bytes"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "MIME type"
+                  },
+                  "md5": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Test Case Attachments"
+        ],
+        "summary": "List test case attachments",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "contents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "fileName": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "md5": {
+                            "type": "string"
+                          },
+                          "uploaded": {
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "nullable": true
+                          },
+                          "downloadUrl": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Presigned S3 download URL (300s). Null until `uploaded` is true."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Lista os anexos do test case. Itens com `uploaded=true` trazem `downloadUrl` (presigned, 300s).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Test Case ID"
+          }
+        ]
+      }
+    },
+    "/v1/test-cases/{id}/attachments/{attachmentId}": {
+      "patch": {
+        "tags": [
+          "Test Case Attachments"
+        ],
+        "summary": "Confirm test case attachment upload",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "md5": {
+                      "type": "string"
+                    },
+                    "uploaded": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
+                    "downloadUrl": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Presigned S3 download URL (300s). Null until `uploaded` is true."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Marca o anexo como enviado (`uploaded=true`) após o PUT no S3.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Test Case ID"
+          },
+          {
+            "name": "attachmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Attachment ID"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Test Case Attachments"
+        ],
+        "summary": "Delete test case attachment",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Remove o anexo (registro + arquivo no S3).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Test Case ID"
+          },
+          {
+            "name": "attachmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Attachment ID"
+          }
+        ]
+      }
+    },
+    "/v1/bugs/{id}/attachments": {
+      "post": {
+        "tags": [
+          "Bug Attachments"
+        ],
+        "summary": "Create bug attachment (returns presigned upload URL)",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "md5": {
+                      "type": "string"
+                    },
+                    "uploaded": {
+                      "type": "boolean"
+                    },
+                    "uploadUrl": {
+                      "type": "string",
+                      "description": "Presigned S3 PUT URL (300s). Faça o PUT do arquivo aqui e depois confirme via PATCH."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Cria o registro do anexo (uploaded=false) e retorna uma presigned URL S3 (PUT, 300s). Faça o PUT do arquivo na `uploadUrl` e depois confirme com PATCH /v1/bugs/:id/attachments/:attachmentId.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Bug ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fileName",
+                  "size",
+                  "type",
+                  "md5"
+                ],
+                "properties": {
+                  "fileName": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "integer",
+                    "description": "Tamanho em bytes"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "MIME type"
+                  },
+                  "md5": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Bug Attachments"
+        ],
+        "summary": "List bug attachments",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "contents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "fileName": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "md5": {
+                            "type": "string"
+                          },
+                          "uploaded": {
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "nullable": true
+                          },
+                          "downloadUrl": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Presigned S3 download URL (300s). Null until `uploaded` is true."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Lista os anexos do bug. Itens com `uploaded=true` trazem `downloadUrl` (presigned, 300s).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Bug ID"
+          }
+        ]
+      }
+    },
+    "/v1/bugs/{id}/attachments/{attachmentId}": {
+      "patch": {
+        "tags": [
+          "Bug Attachments"
+        ],
+        "summary": "Confirm bug attachment upload",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "md5": {
+                      "type": "string"
+                    },
+                    "uploaded": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
+                    "downloadUrl": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Presigned S3 download URL (300s). Null until `uploaded` is true."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Marca o anexo como enviado (`uploaded=true`) após o PUT no S3.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Bug ID"
+          },
+          {
+            "name": "attachmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Attachment ID"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Bug Attachments"
+        ],
+        "summary": "Delete bug attachment",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Remove o anexo (registro + arquivo no S3).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Bug ID"
+          },
+          {
+            "name": "attachmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Attachment ID"
+          }
+        ]
+      }
+    },
+    "/v1/executions/{id}/attachments": {
+      "post": {
+        "tags": [
+          "Execution Attachments"
+        ],
+        "summary": "Create execution attachment (returns presigned upload URL)",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "md5": {
+                      "type": "string"
+                    },
+                    "uploaded": {
+                      "type": "boolean"
+                    },
+                    "uploadUrl": {
+                      "type": "string",
+                      "description": "Presigned S3 PUT URL (300s). Faça o PUT do arquivo aqui e depois confirme via PATCH."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Cria o registro do anexo (uploaded=false) e retorna uma presigned URL S3 (PUT, 300s). Faça o PUT do arquivo na `uploadUrl` e depois confirme com PATCH /v1/executions/:id/attachments/:attachmentId.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Execution ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fileName",
+                  "size",
+                  "type",
+                  "md5"
+                ],
+                "properties": {
+                  "fileName": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "integer",
+                    "description": "Tamanho em bytes"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "MIME type"
+                  },
+                  "md5": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Execution Attachments"
+        ],
+        "summary": "List execution attachments",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "contents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "fileName": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "md5": {
+                            "type": "string"
+                          },
+                          "uploaded": {
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "nullable": true
+                          },
+                          "downloadUrl": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Presigned S3 download URL (300s). Null until `uploaded` is true."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Lista os anexos da execução. Itens com `uploaded=true` trazem `downloadUrl` (presigned, 300s).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Execution ID"
+          }
+        ]
+      }
+    },
+    "/v1/executions/{id}/attachments/{attachmentId}": {
+      "patch": {
+        "tags": [
+          "Execution Attachments"
+        ],
+        "summary": "Confirm execution attachment upload",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "md5": {
+                      "type": "string"
+                    },
+                    "uploaded": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
+                    "downloadUrl": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Presigned S3 download URL (300s). Null until `uploaded` is true."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Marca o anexo como enviado (`uploaded=true`) após o PUT no S3.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Execution ID"
+          },
+          {
+            "name": "attachmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Attachment ID"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Execution Attachments"
+        ],
+        "summary": "Delete execution attachment",
+        "security": [
+          {
+            "ApiToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Remove o anexo (registro + arquivo no S3).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Execution ID"
+          },
+          {
+            "name": "attachmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Attachment ID"
           }
         ]
       }
