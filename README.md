@@ -11,6 +11,22 @@ Exposes every operation from the v1 OpenAPI spec as an MCP tool, so LLM clients 
 - Node.js **18+** (uses native `fetch`).
 - A meloQA **API token** (see User Menu → API Tokens in the meloQA app).
 
+## Install
+
+The package is published on npm as [`@meloqa/mcp-server`](https://www.npmjs.com/package/@meloqa/mcp-server).
+
+You don't need to install it manually — the MCP client config below runs it on demand with `npx`, which fetches the latest version automatically:
+
+```bash
+npx -y @meloqa/mcp-server
+```
+
+To pin it globally instead (exposes the `meloqa-mcp` binary):
+
+```bash
+npm install -g @meloqa/mcp-server
+```
+
 ## Configure in your MCP client
 
 ### Claude Desktop / Claude Code
@@ -32,7 +48,7 @@ Add an entry to your MCP config (`~/Library/Application Support/Claude/claude_de
 }
 ```
 
-Restart the client. The `meloqa` server should appear with ~70 tools (one per v1 endpoint).
+Restart the client. The `meloqa` server should appear with ~80 tools (one per v1 endpoint).
 
 ## Environment variables
 
