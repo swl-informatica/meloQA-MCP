@@ -61,7 +61,7 @@ These are encoded in [src/client.ts](src/client.ts) and matter when changing the
 
 ```bash
 npm install
-npm run sync-spec   # refresh spec/openapi.json from MELOQA_SPEC_URL (default http://localhost:3000/v1/docs.json)
+npm run sync-spec   # refresh spec/openapi.json from MELOQA_SPEC_URL (default https://api.meloqa.com/v1/docs.json)
 npm run gen         # regenerate src/tools.generated.ts from spec/openapi.json
 npm run build       # gen + tsc → dist/
 npm run typecheck   # tsc --noEmit

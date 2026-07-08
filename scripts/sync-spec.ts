@@ -1,7 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const SPEC_URL = process.env.MELOQA_SPEC_URL ?? "http://localhost:3000/v1/docs.json";
+const SPEC_URL = process.env.MELOQA_SPEC_URL ?? "https://api.meloqa.com/v1/docs.json";
 const OUT = resolve(process.cwd(), "spec/openapi.json");
 
 const res = await fetch(SPEC_URL);

@@ -4,7 +4,7 @@ Model Context Protocol (MCP) server for the meloQA public **v1** API.
 
 Exposes every operation from the v1 OpenAPI spec as an MCP tool, so LLM clients (Claude Desktop, Claude Code, Cursor, etc.) can read and manage meloQA projects, test cases, cycles, executions, bugs, links, and reference data.
 
-> **Status:** pre-release. The meloQA v1 API does not yet have a stable public URL — point `MELOQA_BASE_URL` at your own instance (defaults to `http://localhost:3000`).
+> **Status:** pre-release. Defaults to the public endpoint `https://api.meloqa.com`; override `MELOQA_BASE_URL` to point at another instance (e.g. a local `http://localhost:3000`).
 
 ## Requirements
 
@@ -25,7 +25,7 @@ Add an entry to your MCP config (`~/Library/Application Support/Claude/claude_de
       "args": ["-y", "@meloqa/mcp-server"],
       "env": {
         "MELOQA_API_TOKEN": "your-token-here",
-        "MELOQA_BASE_URL": "http://localhost:3000"
+        "MELOQA_BASE_URL": "https://api.meloqa.com"
       }
     }
   }
@@ -39,7 +39,7 @@ Restart the client. The `meloqa` server should appear with ~70 tools (one per v1
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
 | `MELOQA_API_TOKEN` | yes | — | API token sent as `Authorization: Bearer <token>`. |
-| `MELOQA_BASE_URL` | no | `http://localhost:3000` | Base URL of the meloQA instance. No official public URL exists yet — point this at your own deployment. |
+| `MELOQA_BASE_URL` | no | `https://api.meloqa.com` | Base URL of the meloQA instance. Override to point at another deployment (e.g. `http://localhost:3000`). |
 | `MELOQA_RATE_LIMIT` | no | `30` | Client-side limit (requests/minute) used to throttle outgoing calls. Match the server's limit. |
 
 ## Token lifecycle
@@ -87,7 +87,7 @@ npm run dev             # run from source via tsx
 To test the generated server against a running meloQA instance:
 
 ```bash
-MELOQA_API_TOKEN=... MELOQA_BASE_URL=http://localhost:3000 npm run dev
+MELOQA_API_TOKEN=... MELOQA_BASE_URL=https://api.meloqa.com npm run dev
 ```
 
 Then pipe JSON-RPC messages on stdin or wire it up via an MCP client.
