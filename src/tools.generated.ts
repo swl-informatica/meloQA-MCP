@@ -1,7 +1,7 @@
 // AUTO-GENERATED — do not edit by hand. Run `npm run gen` to regenerate.
 // Source: spec/openapi.json
 //
-// 83 tools generated from the meloQA Public API v1 spec.
+// 96 tools generated from the meloQA Public API v1 spec.
 
 import type { ToolDef, HttpRequest } from "./types.js";
 
@@ -781,7 +781,8 @@ export const tools: ToolDef[] = [
         },
         "statusId": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "description": "Cycle status ID — use GET /v1/cycle-statuses. Required."
         },
         "folderId": {
           "type": "string",
@@ -809,7 +810,8 @@ export const tools: ToolDef[] = [
       "additionalProperties": false,
       "required": [
         "name",
-        "projectId"
+        "projectId",
+        "statusId"
       ]
     },
     request: (input: any) => {
@@ -897,6 +899,91 @@ export const tools: ToolDef[] = [
     if (input.projectId !== undefined && input.projectId !== null) query["projectId"] = String(input.projectId);
     if (input.folderId !== undefined && input.folderId !== null) query["folderId"] = String(input.folderId);
     if (Object.keys(query).length > 0) req.query = query;
+    return req;
+  },
+  },
+  {
+    name: "cycles_tags_create",
+    description: "Link tags to a test cycle\n\nTag: Test Cycles\n\nLinks one or more existing tags to the test cycle. Create the tags first via `POST /v1/tags`.\n\nTags already linked are ignored, so repeating the call neither duplicates the link nor fails. Returns the full tag list of the test cycle after the operation.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Cycle ID"
+        },
+        "tagIds": {
+          "type": "array",
+          "minItems": 1,
+          "description": "IDs of tags to link. Every tag must belong to the same project as the entity. Tags already linked are ignored, so the call is safe to repeat.",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "tagIds"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "POST", path: `/v1/cycles/${encodeURIComponent(String(input.id))}/tags` };
+    const body: Record<string, unknown> = {};
+    if (input.tagIds !== undefined) body["tagIds"] = input.tagIds;
+    req.body = body;
+    return req;
+  },
+  },
+  {
+    name: "cycles_tags_delete",
+    description: "Unlink a tag from a test cycle\n\nTag: Test Cycles\n\nRemoves the link between the test cycle and the tag. The tag itself is not deleted. Unlinking a tag that was not linked succeeds and changes nothing. Returns the full tag list of the test cycle after the operation.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Cycle ID"
+        },
+        "tagId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Tag ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "tagId"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "DELETE", path: `/v1/cycles/${encodeURIComponent(String(input.id))}/tags/${encodeURIComponent(String(input.tagId))}` };
+    return req;
+  },
+  },
+  {
+    name: "cycles_tags_list",
+    description: "List tags linked to a test cycle\n\nTag: Test Cycles",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Cycle ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "GET", path: `/v1/cycles/${encodeURIComponent(String(input.id))}/tags` };
     return req;
   },
   },
@@ -1895,6 +1982,66 @@ export const tools: ToolDef[] = [
   },
   },
   {
+    name: "projects_test_case_custom_fields_create",
+    description: "Create a custom field definition for test cases\n\nTag: Projects\n\nCreates a custom field for the project's test cases. The returned `id` is what you pass as `projectCustomFieldId` when writing values via `POST`/`PATCH /v1/test-cases`.\n\nFor `select` fields, `options` is required and defines the initial option list; manage it afterwards via `POST /v1/test-case-custom-fields/{id}/options` and `DELETE /v1/test-case-custom-fields/{id}/options/{optionId}`.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Project ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Must be unique among the project's active custom fields."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "long_text",
+            "select"
+          ],
+          "description": "`long_text` for free text, `select` for a fixed option list."
+        },
+        "isEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "When `false` the field is out of use: it stays in the listing, but values sent for it on test cases are silently ignored and it no longer counts toward the required-field rule."
+        },
+        "isRequired": {
+          "type": "boolean",
+          "default": false,
+          "description": "When `true` every test case in the project must carry a value for this field. Enabling it does not backfill existing test cases — but their next `PATCH /v1/test-cases/{id}` is rejected until the value is provided."
+        },
+        "options": {
+          "type": "array",
+          "description": "Option names — required for `select`, rejected for other types. Names repeated within the request are collapsed into a single option.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "POST", path: `/v1/projects/${encodeURIComponent(String(input.id))}/test-case-custom-fields` };
+    const body: Record<string, unknown> = {};
+    if (input.name !== undefined) body["name"] = input.name;
+    if (input.type !== undefined) body["type"] = input.type;
+    if (input.isEnabled !== undefined) body["isEnabled"] = input.isEnabled;
+    if (input.isRequired !== undefined) body["isRequired"] = input.isRequired;
+    if (input.options !== undefined) body["options"] = input.options;
+    req.body = body;
+    return req;
+  },
+  },
+  {
     name: "projects_test_case_custom_fields_list",
     description: "List custom field definitions for test cases of a project\n\nTag: Projects\n\nReturns the custom field schema configured for test cases in the project. Use the `id` of each entry as `projectCustomFieldId` when reading or writing test case custom field values.",
     inputSchema: {
@@ -2109,6 +2256,128 @@ export const tools: ToolDef[] = [
   },
   },
   {
+    name: "test_case_custom_fields_delete",
+    description: "Delete a custom field definition\n\nTag: Projects\n\nRemoves the field from the project. Values already stored on test cases are not erased, but stop being returned. To take a field out of use while keeping it recoverable, prefer `PATCH` with `isEnabled: false`.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case Custom Field ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "DELETE", path: `/v1/test-case-custom-fields/${encodeURIComponent(String(input.id))}` };
+    return req;
+  },
+  },
+  {
+    name: "test_case_custom_fields_options_create",
+    description: "Add options to a select custom field\n\nTag: Projects\n\nAdds options to a `select` field. Names already present on the field are ignored — the option list never accumulates duplicates through this endpoint. Returns the field with its full option list.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case Custom Field ID"
+        },
+        "names": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Option names to add. Names that already exist on the field are ignored, so repeating the call does not create duplicates.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "names"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "POST", path: `/v1/test-case-custom-fields/${encodeURIComponent(String(input.id))}/options` };
+    const body: Record<string, unknown> = {};
+    if (input.names !== undefined) body["names"] = input.names;
+    req.body = body;
+    return req;
+  },
+  },
+  {
+    name: "test_case_custom_fields_options_delete",
+    description: "Remove an option from a select custom field\n\nTag: Projects\n\nRemoves one option from a `select` field. Test cases that already point to the option keep the stored value, but the option stops being offered. Returns the field with its remaining option list.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case Custom Field ID"
+        },
+        "optionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Option ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "optionId"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "DELETE", path: `/v1/test-case-custom-fields/${encodeURIComponent(String(input.id))}/options/${encodeURIComponent(String(input.optionId))}` };
+    return req;
+  },
+  },
+  {
+    name: "test_case_custom_fields_update",
+    description: "Update a custom field definition\n\nTag: Projects\n\nUpdates the field's name and its `isEnabled` / `isRequired` flags. `type` cannot be changed — a field that already holds values would lose them; create a new field instead.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case Custom Field ID"
+        },
+        "name": {
+          "type": "string"
+        },
+        "isEnabled": {
+          "type": "boolean",
+          "description": "When `false` the field is out of use: it stays in the listing, but values sent for it on test cases are silently ignored and it no longer counts toward the required-field rule."
+        },
+        "isRequired": {
+          "type": "boolean",
+          "description": "When `true` every test case in the project must carry a value for this field. Enabling it does not backfill existing test cases — but their next `PATCH /v1/test-cases/{id}` is rejected until the value is provided."
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "PATCH", path: `/v1/test-case-custom-fields/${encodeURIComponent(String(input.id))}` };
+    const body: Record<string, unknown> = {};
+    if (input.name !== undefined) body["name"] = input.name;
+    if (input.isEnabled !== undefined) body["isEnabled"] = input.isEnabled;
+    if (input.isRequired !== undefined) body["isRequired"] = input.isRequired;
+    req.body = body;
+    return req;
+  },
+  },
+  {
     name: "test_case_folders_create",
     description: "Create test case folder\n\nTag: Test Case Folders\n\nFolder hierarchy is limited to **3 sub-levels** below the project root. Creating a folder under a parent that is already at the 3rd sub-level returns 400.",
     inputSchema: {
@@ -2289,7 +2558,7 @@ export const tools: ToolDef[] = [
   },
   {
     name: "test_cases_archived_list",
-    description: "List archived test cases\n\nTag: Test Cases\n\nReturns only archived test cases (`statusId === ARCHIVED`). At least one of **projectId** or **folderId** is required.",
+    description: "List archived test cases\n\nTag: Test Cases\n\nReturns only archived test cases (`statusId === ARCHIVED`). At least one of **projectId** or **folderId** is required.\n\n`search`, `statusId`, `type` and `automated` are combined with AND, and stack on top of `projectId`/`folderId`. Use `fields=compact` to cut the payload down to `id`, `code`, `name` and `folderId`.",
     inputSchema: {
       "type": "object",
       "properties": {
@@ -2302,6 +2571,37 @@ export const tools: ToolDef[] = [
           "type": "string",
           "format": "uuid",
           "description": "Filter by folder. At least one of projectId or folderId is required."
+        },
+        "search": {
+          "type": "string",
+          "description": "Free-text filter. Matches anywhere in the test case **name** or **code** — so a prefix like `[SANDBOX-APPLE]` works. Case-insensitive. Step content and description are **not** searched."
+        },
+        "statusId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Filter by status — use `GET /v1/test-case-statuses`."
+        },
+        "type": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Filter by test case type — use `GET /v1/test-case-types`."
+        },
+        "automated": {
+          "type": "string",
+          "enum": [
+            "NO",
+            "IN_PROGRESS",
+            "YES"
+          ],
+          "description": "Filter by automation state."
+        },
+        "fields": {
+          "type": "string",
+          "enum": [
+            "full",
+            "compact"
+          ],
+          "description": "Response shape. `full` (default) returns the whole test case, including steps and custom fields. `compact` returns only `id`, `code`, `name` and `folderId` — much smaller payload, meant for sweeping a project before deciding what to open."
         }
       },
       "additionalProperties": false
@@ -2311,6 +2611,11 @@ export const tools: ToolDef[] = [
     const query: Record<string, string> = {};
     if (input.projectId !== undefined && input.projectId !== null) query["projectId"] = String(input.projectId);
     if (input.folderId !== undefined && input.folderId !== null) query["folderId"] = String(input.folderId);
+    if (input.search !== undefined && input.search !== null) query["search"] = String(input.search);
+    if (input.statusId !== undefined && input.statusId !== null) query["statusId"] = String(input.statusId);
+    if (input.type !== undefined && input.type !== null) query["type"] = String(input.type);
+    if (input.automated !== undefined && input.automated !== null) query["automated"] = String(input.automated);
+    if (input.fields !== undefined && input.fields !== null) query["fields"] = String(input.fields);
     if (Object.keys(query).length > 0) req.query = query;
     return req;
   },
@@ -2436,6 +2741,120 @@ export const tools: ToolDef[] = [
     },
     request: (input: any) => {
     const req: HttpRequest = { method: "PATCH", path: `/v1/test-cases/${encodeURIComponent(String(input.id))}/attachments/${encodeURIComponent(String(input.attachmentId))}` };
+    return req;
+  },
+  },
+  {
+    name: "test_cases_batch_update",
+    description: "Update several test cases in one call\n\nTag: Test Cases\n\nApplies a different patch to each test case in one call, instead of one `PATCH /v1/test-cases/{id}` per case.\n\n**All-or-nothing.** Every entry is validated first and nothing is written until all of them pass; the writes then\nrun inside a single transaction. A rejected entry means the whole call is a no-op — the project never ends up\nhalf-changed. On rejection the response names every offending entry by its position, so one round-trip is enough\nto fix them all.\n\nEach entry takes the same fields as the single `PATCH`, plus the `id` of the test case, with two exceptions:\n**`steps` and `customFields` are rejected here** — both are multi-row operations that cannot honour the\nall-or-nothing guarantee. Use `PATCH /v1/test-cases/{id}` for those.\n\nUpdating a test case does **not** create a new version: the `id` and the `code` are preserved. Cycles the\ntest case is already in keep the version they received — add it to a new cycle to exercise the updated one.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "testCases": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "description": "Up to 100 entries. Each `id` may appear only once.",
+          "items": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Test case to update."
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "preRequirements": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "expectedResult": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "scenario": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "statusId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "folderId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "order": {
+                "type": "integer"
+              },
+              "automation": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "NOT_AUTOMATED",
+                  "AUTOMATED"
+                ]
+              },
+              "automated": {
+                "type": "string",
+                "enum": [
+                  "NO",
+                  "IN_PROGRESS",
+                  "YES"
+                ]
+              },
+              "specificationTime": {
+                "type": "integer"
+              },
+              "automatizationTime": {
+                "type": "integer"
+              },
+              "bddRawText": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "testCases"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "PATCH", path: "/v1/test-cases/batch" };
+    const body: Record<string, unknown> = {};
+    if (input.testCases !== undefined) body["testCases"] = input.testCases;
+    req.body = body;
     return req;
   },
   },
@@ -2652,7 +3071,7 @@ export const tools: ToolDef[] = [
   },
   {
     name: "test_cases_list",
-    description: "List test cases\n\nTag: Test Cases\n\nAt least one query parameter is required: **projectId** or **folderId**. Archived test cases (`statusId === ARCHIVED`) are excluded — use `GET /v1/test-cases/archived` to list those.",
+    description: "List test cases\n\nTag: Test Cases\n\nAt least one query parameter is required: **projectId** or **folderId**. Archived test cases (`statusId === ARCHIVED`) are excluded — use `GET /v1/test-cases/archived` to list those.\n\n`search`, `statusId`, `type` and `automated` are combined with AND, and stack on top of `projectId`/`folderId`. Use `fields=compact` to cut the payload down to `id`, `code`, `name` and `folderId`.",
     inputSchema: {
       "type": "object",
       "properties": {
@@ -2665,6 +3084,37 @@ export const tools: ToolDef[] = [
           "type": "string",
           "format": "uuid",
           "description": "Filter by folder. At least one of projectId or folderId is required."
+        },
+        "search": {
+          "type": "string",
+          "description": "Free-text filter. Matches anywhere in the test case **name** or **code** — so a prefix like `[SANDBOX-APPLE]` works. Case-insensitive. Step content and description are **not** searched."
+        },
+        "statusId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Filter by status — use `GET /v1/test-case-statuses`."
+        },
+        "type": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Filter by test case type — use `GET /v1/test-case-types`."
+        },
+        "automated": {
+          "type": "string",
+          "enum": [
+            "NO",
+            "IN_PROGRESS",
+            "YES"
+          ],
+          "description": "Filter by automation state."
+        },
+        "fields": {
+          "type": "string",
+          "enum": [
+            "full",
+            "compact"
+          ],
+          "description": "Response shape. `full` (default) returns the whole test case, including steps and custom fields. `compact` returns only `id`, `code`, `name` and `folderId` — much smaller payload, meant for sweeping a project before deciding what to open."
         }
       },
       "additionalProperties": false
@@ -2674,7 +3124,139 @@ export const tools: ToolDef[] = [
     const query: Record<string, string> = {};
     if (input.projectId !== undefined && input.projectId !== null) query["projectId"] = String(input.projectId);
     if (input.folderId !== undefined && input.folderId !== null) query["folderId"] = String(input.folderId);
+    if (input.search !== undefined && input.search !== null) query["search"] = String(input.search);
+    if (input.statusId !== undefined && input.statusId !== null) query["statusId"] = String(input.statusId);
+    if (input.type !== undefined && input.type !== null) query["type"] = String(input.type);
+    if (input.automated !== undefined && input.automated !== null) query["automated"] = String(input.automated);
+    if (input.fields !== undefined && input.fields !== null) query["fields"] = String(input.fields);
     if (Object.keys(query).length > 0) req.query = query;
+    return req;
+  },
+  },
+  {
+    name: "test_cases_tags_batch_create",
+    description: "Link tags to many test cases at once\n\nTag: Test Cases\n\nApplies every tag in `tagIds` to every test case in `testCaseIds`, in one call.\n\nThis is the counterpart of `POST /v1/test-cases/{id}/tags`: that one puts several tags on a single test case, this one puts a tag across a whole selection. Marking a regression suite of 200 test cases is one request here instead of one request per case against the rate limit.\n\n**All-or-nothing.** Everything is validated before anything is written, and the writes run in a single transaction — a bad ID means the whole call is a no-op, never a half-tagged selection.\n\n**Idempotent.** Pairs already linked are counted in `alreadyLinked` and left alone, so the call is safe to repeat.\n\nAll test cases must belong to the same project, and every tag must belong to that project.\n\nTags are linked to the test case row you pass in — not to the version chain. A new version of the test case receives the tags by copy.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "testCaseIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "description": "Test cases to tag, up to 200. All of them must belong to the same project — tags are scoped per project, so a batch cannot span projects.",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "tagIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "description": "Tags to apply to every test case in the list, up to 20. Create them first via `POST /v1/tags`.",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "testCaseIds",
+        "tagIds"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "POST", path: "/v1/test-cases/tags/batch" };
+    const body: Record<string, unknown> = {};
+    if (input.testCaseIds !== undefined) body["testCaseIds"] = input.testCaseIds;
+    if (input.tagIds !== undefined) body["tagIds"] = input.tagIds;
+    req.body = body;
+    return req;
+  },
+  },
+  {
+    name: "test_cases_tags_create",
+    description: "Link tags to a test case\n\nTag: Test Cases\n\nLinks one or more existing tags to the test case. Create the tags first via `POST /v1/tags`.\n\nTags already linked are ignored, so repeating the call neither duplicates the link nor fails. Returns the full tag list of the test case after the operation.\n\nTags are linked to the test case row you pass in — not to the version chain. A new version of the test case receives the tags by copy.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case ID"
+        },
+        "tagIds": {
+          "type": "array",
+          "minItems": 1,
+          "description": "IDs of tags to link. Every tag must belong to the same project as the entity. Tags already linked are ignored, so the call is safe to repeat.",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "tagIds"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "POST", path: `/v1/test-cases/${encodeURIComponent(String(input.id))}/tags` };
+    const body: Record<string, unknown> = {};
+    if (input.tagIds !== undefined) body["tagIds"] = input.tagIds;
+    req.body = body;
+    return req;
+  },
+  },
+  {
+    name: "test_cases_tags_delete",
+    description: "Unlink a tag from a test case\n\nTag: Test Cases\n\nRemoves the link between the test case and the tag. The tag itself is not deleted. Unlinking a tag that was not linked succeeds and changes nothing. Returns the full tag list of the test case after the operation.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case ID"
+        },
+        "tagId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Tag ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "tagId"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "DELETE", path: `/v1/test-cases/${encodeURIComponent(String(input.id))}/tags/${encodeURIComponent(String(input.tagId))}` };
+    return req;
+  },
+  },
+  {
+    name: "test_cases_tags_list",
+    description: "List tags linked to a test case\n\nTag: Test Cases\n\nTags are linked to the test case row you pass in — not to the version chain. A new version of the test case receives the tags by copy.",
+    inputSchema: {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Test Case ID"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ]
+    },
+    request: (input: any) => {
+    const req: HttpRequest = { method: "GET", path: `/v1/test-cases/${encodeURIComponent(String(input.id))}/tags` };
     return req;
   },
   },
@@ -2711,7 +3293,7 @@ export const tools: ToolDef[] = [
   },
   {
     name: "test_cases_update",
-    description: "Update test case\n\nTag: Test Cases\n\nArchived test cases (`statusId === ARCHIVED`) are read-only and cannot be updated through this endpoint.",
+    description: "Update test case\n\nTag: Test Cases\n\n**Updating does not create a new version.** The `id` and the `code` are preserved, and no earlier version of the test case is kept.\n\n**Sending `steps` replaces the whole list.** The previous steps are soft-deleted and the new ones get new IDs — step IDs are *not* reused, so do not treat them as stable across an update that sends `steps`. Step IDs only survive an update that omits `steps` entirely.\n\n**Cycles keep the test case as it was when it was added.** Updating a test case does not propagate to the cycles it is already in: those keep running, and reporting on, the version they received. Results already recorded stay intact. To exercise the updated test case, add it to a new cycle — that is how a cycle picks up a newer version.\n\nArchived test cases (`statusId === ARCHIVED`) are read-only and cannot be updated through this endpoint.",
     inputSchema: {
       "type": "object",
       "properties": {

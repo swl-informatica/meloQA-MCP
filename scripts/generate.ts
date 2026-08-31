@@ -49,6 +49,12 @@ const NAME_OVERRIDES: Record<string, string> = {
   "POST /v1/test-cases/{id}/attachments": "test_cases_attachments_create",
   "POST /v1/bugs/{id}/attachments": "bugs_attachments_create",
   "POST /v1/executions/{id}/attachments": "executions_attachments_create",
+  // Mesma regra para as sub-coleções que entraram com o vínculo de tag e a
+  // escrita de campo personalizado: o segmento final é substantivo, não verbo.
+  "POST /v1/test-cases/{id}/tags": "test_cases_tags_create",
+  "POST /v1/cycles/{id}/tags": "cycles_tags_create",
+  "POST /v1/projects/{id}/test-case-custom-fields": "projects_test_case_custom_fields_create",
+  "POST /v1/test-case-custom-fields/{id}/options": "test_case_custom_fields_options_create",
 };
 
 function deriveToolName(method: Method, path: string): string {
