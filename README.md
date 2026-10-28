@@ -48,7 +48,7 @@ Add an entry to your MCP config (`~/Library/Application Support/Claude/claude_de
 }
 ```
 
-Restart the client. The `meloqa` server should appear with ~80 tools (one per v1 endpoint).
+Restart the client. The `meloqa` server should appear with one tool per v1 endpoint (96 as of 0.3.0).
 
 ## Environment variables
 
@@ -94,7 +94,7 @@ Each tool's `description` includes the OpenAPI `summary`, the tag, and any valid
 
 ```bash
 npm install
-npm run sync-spec       # refresh spec/openapi.json from MELOQA_SPEC_URL (default http://localhost:3000/v1/docs.json)
+npm run sync-spec       # refresh spec/openapi.json from MELOQA_SPEC_URL (default https://api.meloqa.com/v1/docs.json)
 npm run gen             # regenerate src/tools.generated.ts from the spec
 npm run build           # gen + tsc → dist/
 npm run dev             # run from source via tsx

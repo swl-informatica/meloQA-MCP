@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-`@meloqa/mcp-server` (binary `meloqa-mcp`) — a public MCP server that wraps the meloQA **public v1 API**. The repo is intentionally separate from the main meloQA codebase so it can be distributed via npm to any MCP client. ~70 tools, one per OpenAPI operation.
+`@meloqa/mcp-server` (binary `meloqa-mcp`) — a public MCP server that wraps the meloQA **public v1 API**. The repo is intentionally separate from the main meloQA codebase so it can be distributed via npm to any MCP client. One tool per OpenAPI operation (96 as of 0.3.0).
 
 ## Architecture
 

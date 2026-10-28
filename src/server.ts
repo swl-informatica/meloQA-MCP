@@ -1,3 +1,5 @@
+import { createRequire } from "node:module";
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
   CallToolRequestSchema,
@@ -7,6 +9,9 @@ import {
 import { MeloqaClient, MeloqaError } from "./client.js";
 import { tools } from "./tools.generated.js";
 import type { ToolDef } from "./types.js";
+
+// package.json fica um nível acima tanto de src/ quanto de dist/
+const { version } = createRequire(import.meta.url)("../package.json") as { version: string };
 
 export interface ServerOptions {
   baseUrl: string;
@@ -21,7 +26,7 @@ export function createServer(opts: ServerOptions): Server {
   const server = new Server(
     {
       name: "meloqa-mcp",
-      version: "0.1.0",
+      version,
     },
     {
       capabilities: {
