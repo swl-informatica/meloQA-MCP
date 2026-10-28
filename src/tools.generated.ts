@@ -1835,13 +1835,13 @@ export const tools: ToolDef[] = [
   },
   {
     name: "projects_create",
-    description: "Create project\n\nTag: Projects\n\nValidation rules:\n- `name` must not exceed 20 characters.\n- `description` must not exceed 250 characters.\n- `projectPictureUrl` must reference a project picture predefined by the meloQA API — list the available IDs via `GET /v1/project-pictures`.",
+    description: "Create project\n\nTag: Projects\n\nValidation rules:\n- `name` must not exceed 50 characters.\n- `description` must not exceed 250 characters.\n- `projectPictureUrl` must reference a project picture predefined by the meloQA API — list the available IDs via `GET /v1/project-pictures`.",
     inputSchema: {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
-          "maxLength": 20
+          "maxLength": 50
         },
         "organizationId": {
           "type": "string",
@@ -2065,7 +2065,7 @@ export const tools: ToolDef[] = [
   },
   {
     name: "projects_update",
-    description: "Update project\n\nTag: Projects\n\nValidation rules:\n- `name` must not exceed 20 characters.\n- `description` must not exceed 250 characters.\n- `projectPictureUrl` must reference a project picture predefined by the meloQA API — list the available IDs via `GET /v1/project-pictures`.",
+    description: "Update project\n\nTag: Projects\n\nValidation rules:\n- `name` must not exceed 50 characters.\n- `description` must not exceed 250 characters.\n- `projectPictureUrl` must reference a project picture predefined by the meloQA API — list the available IDs via `GET /v1/project-pictures`.",
     inputSchema: {
       "type": "object",
       "properties": {
@@ -2076,7 +2076,7 @@ export const tools: ToolDef[] = [
         },
         "name": {
           "type": "string",
-          "maxLength": 20
+          "maxLength": 50
         },
         "description": {
           "type": [
@@ -2581,6 +2581,11 @@ export const tools: ToolDef[] = [
           "format": "uuid",
           "description": "Filter by status — use `GET /v1/test-case-statuses`."
         },
+        "tagId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Filter by linked tag — use `GET /v1/tags?projectId=...`. Returns the test cases carrying that tag. Combine with `fields=compact` to sweep a whole project for a tag in a single call."
+        },
         "type": {
           "type": "string",
           "format": "uuid",
@@ -2613,6 +2618,7 @@ export const tools: ToolDef[] = [
     if (input.folderId !== undefined && input.folderId !== null) query["folderId"] = String(input.folderId);
     if (input.search !== undefined && input.search !== null) query["search"] = String(input.search);
     if (input.statusId !== undefined && input.statusId !== null) query["statusId"] = String(input.statusId);
+    if (input.tagId !== undefined && input.tagId !== null) query["tagId"] = String(input.tagId);
     if (input.type !== undefined && input.type !== null) query["type"] = String(input.type);
     if (input.automated !== undefined && input.automated !== null) query["automated"] = String(input.automated);
     if (input.fields !== undefined && input.fields !== null) query["fields"] = String(input.fields);
@@ -3094,6 +3100,11 @@ export const tools: ToolDef[] = [
           "format": "uuid",
           "description": "Filter by status — use `GET /v1/test-case-statuses`."
         },
+        "tagId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Filter by linked tag — use `GET /v1/tags?projectId=...`. Returns the test cases carrying that tag. Combine with `fields=compact` to sweep a whole project for a tag in a single call."
+        },
         "type": {
           "type": "string",
           "format": "uuid",
@@ -3126,6 +3137,7 @@ export const tools: ToolDef[] = [
     if (input.folderId !== undefined && input.folderId !== null) query["folderId"] = String(input.folderId);
     if (input.search !== undefined && input.search !== null) query["search"] = String(input.search);
     if (input.statusId !== undefined && input.statusId !== null) query["statusId"] = String(input.statusId);
+    if (input.tagId !== undefined && input.tagId !== null) query["tagId"] = String(input.tagId);
     if (input.type !== undefined && input.type !== null) query["type"] = String(input.type);
     if (input.automated !== undefined && input.automated !== null) query["automated"] = String(input.automated);
     if (input.fields !== undefined && input.fields !== null) query["fields"] = String(input.fields);

@@ -3,7 +3,7 @@
   "info": {
     "title": "MeloQA Public API",
     "version": "1.0.0",
-    "description": "Public API for MeloQA integrations. Authenticate using 'Authorization: Bearer <api-token>'."
+    "description": "Public API for MeloQA integrations.\n\n**Authentication.** Send `Authorization: Bearer <api-token>` on every request. The token is an\nAPI token issued from the meloQA interface — not an interface session. A request without it, or\nwith an invalid one, gets `401`.\n\n**Rate limit.** 30 requests per minute, per token. Over that you get `429`; wait and retry. Where\nan endpoint has a batch counterpart, prefer it — one batch call costs one request no matter how\nmany records it carries.\n\n**HTTP clients.** Any client works: `urllib`, `requests`, `httpx`, `axios`, `curl`. No particular\nUser-Agent is required and none is rejected. If you get a `403` on every route, including ones you\nknow exist and with a valid token, that is not this API answering — an authentication problem\nsurfaces as `401`, and a permission problem as `403` on that route alone, never on all of them.\nReport it rather than working around it."
   },
   "servers": [
     {
@@ -796,7 +796,7 @@
             "description": "Not Found"
           }
         },
-        "description": "Validation rules:\n- `name` must not exceed 20 characters.\n- `description` must not exceed 250 characters.\n- `projectPictureUrl` must reference a project picture predefined by the meloQA API — list the available IDs via `GET /v1/project-pictures`.",
+        "description": "Validation rules:\n- `name` must not exceed 50 characters.\n- `description` must not exceed 250 characters.\n- `projectPictureUrl` must reference a project picture predefined by the meloQA API — list the available IDs via `GET /v1/project-pictures`.",
         "parameters": [
           {
             "name": "id",
@@ -818,7 +818,7 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 50
                   },
                   "description": {
                     "type": "string",
@@ -1131,7 +1131,7 @@
             "description": "Not Found"
           }
         },
-        "description": "Validation rules:\n- `name` must not exceed 20 characters.\n- `description` must not exceed 250 characters.\n- `projectPictureUrl` must reference a project picture predefined by the meloQA API — list the available IDs via `GET /v1/project-pictures`.",
+        "description": "Validation rules:\n- `name` must not exceed 50 characters.\n- `description` must not exceed 250 characters.\n- `projectPictureUrl` must reference a project picture predefined by the meloQA API — list the available IDs via `GET /v1/project-pictures`.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1146,7 +1146,7 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 50
                   },
                   "organizationId": {
                     "type": "string",
@@ -2068,6 +2068,26 @@
                                   }
                                 }
                               },
+                              "tags": {
+                                "type": "array",
+                                "description": "Tags linked to this test case. Empty when none. Manage with `POST`/`DELETE /v1/test-cases/{id}/tags`, or across a selection with `POST /v1/test-cases/tags/batch`. Not returned when `fields=compact`.",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "color": {
+                                      "type": "string",
+                                      "nullable": true
+                                    }
+                                  }
+                                }
+                              },
                               "steps": {
                                 "type": "array",
                                 "description": "Active steps of the test case, ordered by `order` ascending. Empty when the test case type does not use steps.",
@@ -2190,6 +2210,16 @@
               "format": "uuid"
             },
             "description": "Filter by status — use `GET /v1/test-case-statuses`."
+          },
+          {
+            "name": "tagId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filter by linked tag — use `GET /v1/tags?projectId=...`. Returns the test cases carrying that tag. Combine with `fields=compact` to sweep a whole project for a tag in a single call."
           },
           {
             "name": "type",
@@ -2428,6 +2458,26 @@
                             "format": "uuid",
                             "nullable": true,
                             "description": "Filled for select-type fields — references one of `selects[].id` from the field definition."
+                          }
+                        }
+                      }
+                    },
+                    "tags": {
+                      "type": "array",
+                      "description": "Tags linked to this test case. Empty when none. Manage with `POST`/`DELETE /v1/test-cases/{id}/tags`, or across a selection with `POST /v1/test-cases/tags/batch`. Not returned when `fields=compact`.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "color": {
+                            "type": "string",
+                            "nullable": true
                           }
                         }
                       }
@@ -2697,6 +2747,26 @@
                             "format": "uuid",
                             "nullable": true,
                             "description": "Filled for select-type fields — references one of `selects[].id` from the field definition."
+                          }
+                        }
+                      }
+                    },
+                    "tags": {
+                      "type": "array",
+                      "description": "Tags linked to this test case. Empty when none. Manage with `POST`/`DELETE /v1/test-cases/{id}/tags`, or across a selection with `POST /v1/test-cases/tags/batch`. Not returned when `fields=compact`.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "color": {
+                            "type": "string",
+                            "nullable": true
                           }
                         }
                       }
@@ -3167,6 +3237,26 @@
                                   }
                                 }
                               },
+                              "tags": {
+                                "type": "array",
+                                "description": "Tags linked to this test case. Empty when none. Manage with `POST`/`DELETE /v1/test-cases/{id}/tags`, or across a selection with `POST /v1/test-cases/tags/batch`. Not returned when `fields=compact`.",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "color": {
+                                      "type": "string",
+                                      "nullable": true
+                                    }
+                                  }
+                                }
+                              },
                               "steps": {
                                 "type": "array",
                                 "description": "Active steps of the test case, ordered by `order` ascending. Empty when the test case type does not use steps.",
@@ -3289,6 +3379,16 @@
               "format": "uuid"
             },
             "description": "Filter by status — use `GET /v1/test-case-statuses`."
+          },
+          {
+            "name": "tagId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filter by linked tag — use `GET /v1/tags?projectId=...`. Returns the test cases carrying that tag. Combine with `fields=compact` to sweep a whole project for a tag in a single call."
           },
           {
             "name": "type",
@@ -3525,6 +3625,26 @@
                             "format": "uuid",
                             "nullable": true,
                             "description": "Filled for select-type fields — references one of `selects[].id` from the field definition."
+                          }
+                        }
+                      }
+                    },
+                    "tags": {
+                      "type": "array",
+                      "description": "Tags linked to this test case. Empty when none. Manage with `POST`/`DELETE /v1/test-cases/{id}/tags`, or across a selection with `POST /v1/test-cases/tags/batch`. Not returned when `fields=compact`.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "color": {
+                            "type": "string",
+                            "nullable": true
                           }
                         }
                       }
@@ -3963,6 +4083,26 @@
                               }
                             }
                           },
+                          "tags": {
+                            "type": "array",
+                            "description": "Tags linked to this test case. Empty when none. Manage with `POST`/`DELETE /v1/test-cases/{id}/tags`, or across a selection with `POST /v1/test-cases/tags/batch`. Not returned when `fields=compact`.",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "color": {
+                                  "type": "string",
+                                  "nullable": true
+                                }
+                              }
+                            }
+                          },
                           "steps": {
                             "type": "array",
                             "description": "Active steps of the test case, ordered by `order` ascending. Empty when the test case type does not use steps.",
@@ -4329,6 +4469,26 @@
                             "format": "uuid",
                             "nullable": true,
                             "description": "Filled for select-type fields — references one of `selects[].id` from the field definition."
+                          }
+                        }
+                      }
+                    },
+                    "tags": {
+                      "type": "array",
+                      "description": "Tags linked to this test case. Empty when none. Manage with `POST`/`DELETE /v1/test-cases/{id}/tags`, or across a selection with `POST /v1/test-cases/tags/batch`. Not returned when `fields=compact`.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "color": {
+                            "type": "string",
+                            "nullable": true
                           }
                         }
                       }
