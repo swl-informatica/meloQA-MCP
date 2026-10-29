@@ -4,3 +4,6 @@ dist/
 .DS_Store
 .env
 .env.local
+
+# Configuração local do Claude Code (cada um mantém a sua)
+.claude/settings.local.json

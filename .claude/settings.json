@@ -4,12 +4,10 @@
       "Bash(node -e \"const s=require\\('./spec/openapi.json'\\); console.log\\('OpenAPI version:', s.openapi\\); console.log\\('title:', s.info&&s.info.title\\); console.log\\('version:', s.info&&s.info.version\\); console.log\\('paths:', Object.keys\\(s.paths||{}\\).length\\);\")",
       "Bash(node -e \"try{const p=require\\('./package.json'\\);console.log\\(p.name,p.version\\)}catch\\(e\\){console.log\\('no root package.json'\\)}\")",
       "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\); console.log\\('--- devDeps tsx/ts-node/tsconfig-paths ---'\\); const d={...p.dependencies,...p.devDependencies}; ['tsx','ts-node','esbuild','typescript','tsconfig-paths'].forEach\\(k=>console.log\\(k, d[k]||'-'\\)\\);\")",
-      "Bash(OUT=/private/tmp/claude-501/-Users-robertpereira-work-projetos-meloqa-dev-meloQA-MCP/8251bc74-664c-4788-b228-35714c8b426d/scratchpad/backend-v1-spec.json npx ts-node --transpile-only --compiler-options '{\"module\":\"commonjs\"}' gen-v1-spec.ts)",
       "Bash(node -e ' *)",
       "Bash(node dist/index.js)",
       "Bash(node -e 'let d=\"\";process.stdin.on\\(\"data\",c=>d+=c\\);process.stdin.on\\(\"end\",\\(\\)=>{for\\(const l of d.split\\(\"\\\\n\"\\)\\){if\\(!l.trim\\(\\)\\)continue;try{const j=JSON.parse\\(l\\);if\\(j.id===2\\){console.log\\(\"tools/list count:\",j.result.tools.length\\);}}catch\\(e\\){}}}\\)')",
       "Bash(MELOQA_API_TOKEN=dummy node dist/index.js)",
-      "Bash(git commit *)",
       "Bash(git remote *)",
       "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('name:',p.name\\); console.log\\('version:',p.version\\); console.log\\('private:',p.private\\); console.log\\('bin:',JSON.stringify\\(p.bin\\)\\); console.log\\('main:',p.main\\); console.log\\('files:',JSON.stringify\\(p.files\\)\\); console.log\\('prepublishOnly:',p.scripts&&p.scripts.prepublishOnly\\); console.log\\('prepare:',p.scripts&&p.scripts.prepare\\); console.log\\('publishConfig:',JSON.stringify\\(p.publishConfig\\)\\);\")",
       "Bash(npm view *)",
@@ -17,12 +15,7 @@
       "Bash(npm whoami *)",
       "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('license field:',p.license\\); console.log\\('repository:',JSON.stringify\\(p.repository\\)\\); console.log\\('homepage:',p.homepage\\); console.log\\('publishConfig:',JSON.stringify\\(p.publishConfig\\)\\);\")",
       "Bash(node -e \"require\\('./package.json'\\); console.log\\('package.json JSON válido ✅'\\)\")",
-      "Bash(npm publish *)",
-      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" https://registry.npmjs.org/@meloqa/mcp-server)",
-      "Bash(git tag *)"
-    ],
-    "additionalDirectories": [
-      "/Users/robertpereira/work/projetos/meloqa/dev/backend"
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" https://registry.npmjs.org/@meloqa/mcp-server)"
     ]
   }
 }
